@@ -24,6 +24,22 @@ Test E2 - Randomness of fragment order
 Test F - Ability to walk the derivative chromosome.
 """
 
+## Test A - Clustering of breakpoints
+
+def test_A(breakpoints):
+    """Takes list of breakpoints and tests for clustering of breakpoints
+    and returns KS test object (concordance with exponential distribution)"""
+
+    break_ends = [bp.pos for bp in breakpoints]
+    n = len(break_ends)
+    dist_btw_breaks = [break_ends[i+1] - break_ends[i] for i in range(n - 1)]
+    exp_mean = np.mean(dist_btw_breaks)
+
+    # should adhere to exponential distribution with exp_mean
+    test = stats.kstest(np.array(dist_btw_breaks), 'expon', args=(0, exp_mean))
+    print 'Clustering of breakpoints (KS test): statistic = %f, p value = %f' % (test.statistic, test.pvalue)
+    return test
+
 ## Test E1 - randomness of fragment joins. ##
 
 def fusion_type_counts(fusions):
@@ -169,3 +185,4 @@ def F_walk(walk):
             % (len(alt_runs), average_run_length))
     print "expected alternating runs: ~ %s; sd: %s" % (mean, np.sqrt(var))
     print "p-value: %.4g\n" % pvalue
+    return mean, var, pvalue
